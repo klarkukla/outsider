@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Henry Darger collections around the world</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime&display=swap" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'DargerScript';
+            src: url('/museums/font/dargerbrutscript-webfont.woff2') format('woff2'),
+                url('/museums/font/dargerbrutscript-webfont.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        html, body{
+            padding: 0;
+            margin: 0;
+            font-family: 'Courier Prime', monospace;
+            cursor: grab;
+        }
+
+        #map{
+            /* width: 4500px;
+            height: 1080px; */
+            width: 100%;
+        }
+
+        #map-container{
+            width: 4500px;
+            height: 1080px;
+            position: relative;
+        }
+
+        .poi-container{
+            position: absolute;
+            width: 24px;
+            height: 23px;
+        }
+
+        .poi{
+            width: 24px;
+            display: block;
+            float: left;
+            /* box-shadow: 2px 10px 20px 0px rgba(0,0,0,0.3);
+            -webkit-box-shadow: 2px 10px 20px 0px rgba(0,0,0,0.3);
+            -moz-box-shadow: 2px 10px 20px 0px rgba(0,0,0,0.3);
+            border-radius: 99px; */
+        }
+
+        .poi img{
+            width: 100%;   
+        }
+
+        .poi-title{
+            margin: 0;
+            font-family: 'DargerScript', script;
+            float: right;
+            position: relative;
+            font-size: 18px;
+            padding: 5px;
+            background-color: rgba(255, 217, 0, 0.3);
+            box-shadow: 2px 10px 20px 0px rgba(0,0,0,0.3);
+            -webkit-box-shadow: 2px 10px 20px 0px rgba(0,0,0,0.3);
+            -moz-box-shadow: 2px 10px 20px 0px rgba(0,0,0,0.3);
+        }
+        .poi-title.border-top{
+            border-top: 2px solid #f00000;
+        }
+        .poi-title.border-bottom{
+            border-bottom: 2px solid #f00000;
+        }
+
+        .poi-title strong{
+            font-size: 16px;
+            font-style: italic;
+        }
+
+        .poi-container.squared img{
+            width: 120px;
+        }
+        .poi-container.squared .poi-title{
+            top: -5px; left: 96px; width: 110px;
+        }
+
+        .popup{
+            position: absolute;
+            width: 280px;
+            background-color: #f00000;
+            color: #ffe100;
+            z-index: 10;
+            padding: 20px;
+            margin: 20px;
+            box-shadow: 2px 10px 20px 0px rgba(0,0,0,0.3);
+            -webkit-box-shadow: 2px 10px 20px 0px rgba(0,0,0,0.3);
+            -moz-box-shadow: 2px 10px 20px 0px rgba(0,0,0,0.3);
+            display: none;
+        }
+
+        .popup .close{
+            float: right;
+            width: 20px;
+        }
+        .popup .close img{
+            width: 100%;
+        }
+
+        .popup .link{
+            background-color: #ffe100;
+            color: #f00000;
+            display: inline-block;
+            padding: 20px;
+            border-radius: 99px;
+            text-decoration: none;
+            width: calc(100% - 40px);
+            text-align: center;
+            margin-top: 20px;
+            font-family: 'Courier Prime', monospace;
+        }
+
+        .frame{
+            position: fixed;
+            left: 0;
+            width: 100%;
+            z-index: 99;
+            pointer-events: none;
+        }
+        #frame-top{
+            top: 0;
+        }
+        #frame-bottom{
+            bottom: 0;
+        }
+
+        #pixi-container{
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .anim-poi img{
+            border-radius:50%;
+            box-shadow: 2px 2px 20px 0px rgba(0,0,0,0.3);
+            width: 120px;
+            /* opacity: 0.8; */
+        }
+
+        .modal{
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 1000;
+            display: none;
+        }
+        .modal .innerframe{
+            width: 34%;
+            height: 70%;
+            margin: auto;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #ffffff14;
+            padding: 40px;
+            overflow-y: scroll;
+            color: white;
+        }
+        .modal .innerframe.noscroll{
+            overflow-y: hidden;
+            background: none;
+        }
+        .modal .fullframe{
+            position: absolute;
+            margin: auto;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 80%;
+            height: 80%;
+        }
+        .modal .smallframe{
+            width: 100%;
+            height: 500px;
+            margin: 20px 0;
+        }
+        .modal h1{
+            margin-bottom: 60px;
+        }
+        .modal h2{
+            margin: 40px 0;
+        }
+        .modal .btn-close{
+            position: absolute;
+            right: 40px;
+            top: 40px;
+        }
+        .avatar{
+            width: 150px;
+        }
+        .btn-podcasts{
+            display: block;
+            background-color: #FFF9E3;
+            border: 4px solid #C8B677;
+            padding: 40px;
+            text-align: center;
+            margin: 60px 0;
+            font-size: 18px;
+            text-decoration: none;
+            color: black;
+        }
+
+        @media screen and (max-width: 768px){
+            .modal .innerframe{
+                width: 80%;
+            }
+            .modal .fullframe{
+                max-height: 400px;
+            }
+        }
+
+        .quote{
+            text-align: center;
+            color: white;
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="dragscroll">
+
+    <div class="modal" id="room">
+        <a href="#" class="btn-close">
+            <img src="/museums/close-white.svg" alt="close">
+        </a>
+        <iframe class="fullframe" width='853' height='480' src='https://my.matterport.com/show/?m=rY87duy8mbk' frameborder='0' allowfullscreen allow='xr-spatial-tracking'></iframe>      
+        <p class="quote">Intuit: The Center for Intuitive and Outsider Art.</p>
+    </div>
+
+    <div class="modal" id="short">
+        <a href="#" class="btn-close">
+            <img src="/museums/close-white.svg" alt="close">
+        </a>
+        <iframe class="fullframe" src="https://www.youtube.com/embed/vFZPh4pEHdo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+
+    <div class="modal" id="youtube">
+        <a href="#" class="btn-close">
+            <img src="/museums/close-white.svg" alt="close">
+        </a>
+        <div class="innerframe">
+            <div class="container">
+                <h1>Music videos</h1>
+                <iframe class="smallframe" width="560" height="315" src="https://www.youtube.com/embed/videoseries?list=PL6c_5GyF9mZQXOmzXyQ5WsqcjZ3GnWYaL" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <iframe class="smallframe" width="560" height="315" src="https://www.youtube.com/embed/vTcrjnJNSNc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <iframe class="smallframe" width="560" height="315" src="https://www.youtube.com/embed/vFZPh4pEHdo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <iframe class="smallframe" width="560" height="315" src="https://www.youtube.com/embed/tgA8wbKZL2s" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <iframe class="smallframe" width="560" height="315" src="https://www.youtube.com/embed/g2MNvXKDlBY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <iframe class="smallframe" width="560" height="315" src="https://www.youtube.com/embed/G8h12wI1tDc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <iframe class="smallframe" width="560" height="315" src="https://www.youtube.com/embed/p3FKn5eVCwg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <iframe class="smallframe" width="560" height="315" src="https://www.youtube.com/embed/YQvrxKoVzu8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <iframe class="smallframe" width="560" height="315" src="https://www.youtube.com/embed/L3sfcfy44Dw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>       
+    </div>
+
+    <div class="modal" id="podcasts">
+        <a href="#" class="btn-close">
+            <img src="/museums/close-white.svg" alt="close">
+        </a>
+        <div class="innerframe noscroll">
+            <div class="container">
+                <a href="https://smarturl.it/outsider.podcast.en" class="btn-podcasts" target="_blank"><img src="/museums/flag-uk.png">  English podcasts</a>
+                <a href="https://smarturl.it/outsider.podcast" class="btn-podcasts" target="_blank"><img src="/museums/flag-fr.png">  Podcasts en français</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="bio">
+        <a href="#" class="btn-close">
+            <img src="/museums/close-white.svg" alt="close">
+        </a>
+        <div class="innerframe">
+            <div class="container">
+                <h1>Biographies</h1>
+                <h2>HENRY DARGER </h2>
+                <img src="/museums/darger.png" class="avatar">
+                <p>
+                    <strong>HENRY DARGER (1892-1973) was a reclusive hospital janitor and dishwasher who led a secret life as a prolific visual artist and epic novelist</strong>. His vast collection of creative work was discovered in 1972 when his two-room apartment in Chicago was cleared out shortly before he died. Over some 350 watercolor, pencil, collage and carbon-traced drawings, most of them stitched into three enormous 'albums', as well as seven typewritten hand-bound books, thousands of bundled sheets of typewritten text, and numerous journals, ledgers and scrapbooks were discovered.
+                    <br><br>Darger's unpublished 15,000-page typewritten fantasy novel, <strong>The Story of the Vivian Girls, in What Is Known as the Realms of the Unreal, of the Glandeco-Angelinian War Storm, Caused by the Child Slave Rebellion</strong> — or, for short, In the Realms of the Unreal — and its 8,500-page handwritten sequel of sorts, Further Adventures of the Vivian Girls in Chicago, were the sagas upon which he based several hundred panoramic 'illustrations', many of them double-sided and more than 9 feet in length
+                </p>
+                <hr>
+                <h2>PHILIPPE COHEN SOLAL</h2>         
+                <img src="/museums/avatar0.png" class="avatar">
+                <div><i>Keyboards & electronics</i></div>
+                <p>
+                    For more than three decades now, Philippe Cohen Solal has been making his mark as an electronic music architect and self-taught composer, having worked in many different areas of music production from A&R to soundtracks, as well as DJ-ing and making records.
+                    <br><br><strong>The million-selling artist, producer, composer and co-founder of Gotan Project</strong>, has also collaborated with numerous artists like Salif Keita, Angelique Kidjo, Horace Andy, Adrien Brody, Roberto Fonseca, Dorfmeister, Chassol, Bobby Mc Ferrin… He founded his own label, ¡Ya Basta! Records, in 1995. 
+                </p>
+                <hr>
+                <h2>MIKE LINDSAY</h2>
+                <img src="/museums/avatar1.png" class="avatar">
+                <div><i>Guitar, bass & electronics</i></div>              
+                <p>
+                    <strong>Mercury Music Prize winning producer, Mike Lindsay</strong> is most known for being the co-founder, composer and producer of UK acid folk band <strong>Tunng</strong>. He has co-written and produced many albums for a wide range of artists including Speech Debelle's Mercury Music prize winning album 'Speech Therapy', Jon Hopkins, Farao, DuBlonde, Low Roar, Beth Jeans Houghton, Serafina Steer, Cibelle and Laura J Martin...
+                </p>
+                <hr>
+                <h2>ADAM GLOVER</h2>
+                <img src="/museums/avatar2.png" class="avatar">
+                <div><i>Lead singer</i></div>        
+                <p>
+                   <strong>Adam Glover is a recording artist originally from Manchester</strong>, UK, where his love for crooning first began. After graduating from the university of Westminster as a Bachelor of Musicology, Adam resided in Los Angeles working with some of the music industry's top producers.
+                </p>
+                <hr>
+                <h2>HANNAH PEEL</h2>
+                <img src="/museums/avatar3.png" class="avatar">
+                <div><i>Keyboards, violin, trombone, vocals</i></div>             
+                <p>
+                    <strong>Emmy-nominated and RTS winning composer</strong>, with a flow of solo albums and collaborative releases, <strong>Hannah joins the dots between science, nature and the creative arts</strong>, through her explorative approach to electronic, classical and traditional music.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="lyrics">
+        <a href="#" class="btn-close">
+            <img src="/museums/close-white.svg" alt="close">
+        </a>
+        <div class="innerframe">         
+            <div class="container">
+                <h1>Lyrics</h1>
+                <h2>1. WHO WILL FOLLOW ANGELINIA ?</h2>
+                <p>
+                    Who will follow Angelinia, Standing for the right,<br>
+                    Holding up her banners, in the thickest fight,<br>
+                    Listening for her orders, ready to obey,<br>
+                    Who will follow Angelinia, Serving her today.<br>
+                    Follow Angelinia,<br>
+                    Who will follow Angelinia ?<br><br>
+    
+                    Who will follow Angelinia, In wars horrid sway,<br>
+                    Marching with the masters, Giving them the praise,<br>
+                    Earnest in the battlefields Honoring her laws<br>
+                    Faithful to her councils, watchful for her cause<br>
+                    Follow Angelinia,<br>
+                    Who will follow Angelinia?<br><br>
+    
+                    Chorus:<br>
+                    Who will follow Angelinia? Who will make reply?<br>
+                    I’m on the Lord’s side, master here am I,<br>
+                    Who will follow Angelinia? Who will make reply?<br>
+                    I’m on the Lord’s side, master here am I<br>
+                    Here am I … Here am I …<br><br>
+    
+                    Who will follow Angelinia, On this work of love<br>
+                    Leading others through the fray, lifting clouds above<br>
+                    Courage faithful servant, In the fierce war we see<br>
+                    On our side forever, Will our savior be<br>
+                    Follow Angelinia,<br>
+                    Who will follow Angelinia?<br><br>
+    
+                    Chorus:<br>
+                    Who will follow Angelinia? Who will make reply?<br>
+                    I’m on the Lord’s side, master here am I,<br>
+                    Who will follow Angelinia? Who will make reply?<br>
+                    I’m on the Lord’s side, master here am I<br>
+                    Here am I … Here am I …<br><br>
+                </p>
+                <hr>
+                <h2>2. HARK HARK MY FRIEND. CANNON THUNDERS ARE SWELLING…</h2>
+                <p>
+                    Hark, hark my friend, cannon thunders are swelling<br>
+                    Over earths green fields and Oceans wave<br>
+                    beat shore<br>
+                    How terrible the truth, those fierce thunders are telling,<br>
+                    Of that battle where the enemy shall be no more….<br><br>
+    
+                    Onward we go, for still we hear them thundering,<br>
+                    Soldiers come, for out leaders bid you come,<br>
+                    And through the dark, it echoes loudly ringing,<br>
+                    The results of battles lead us home<br><br>
+    
+                    Far, far away, like the judgment at evening pealing<br>
+                    The voice of conflict sounds over land and sea,<br>
+                    And land vessels, by thousands swiftly sinking,<br>
+                    Fierce McWierther turn their dreary waves to thee.<br><br>
+    
+                    Rest comes at last, though fight be long and dreary,<br>
+                    The day must dawn and darksome storm be past,<br>
+                    All conflicts end, with welcomes to the weary,<br>
+    
+                    and McWhirther the nations true home,<br>
+                    Will come at last Angels of Jesus, Angels of light, Singing to welcome the fighters of the night. <br>
+                    Angels of Jesus, Angels of Light,<br>
+                    Waiting to welcome the christians of the Fight<br>
+                    Hark, hark my friend, cannon thunders are swelling…<br><br>
+                </p>
+                <hr>
+                <h2>3. ONWARD IN THE FIGHT</h2>
+                <p>
+                    Trying to attack on the hills of our savior<br>
+                    Always following our generals and King,<br>
+                    Shaping our lines vy their brave example,<br>
+                    Happy how happy the results that we bring…<br><br>
+    
+                    Pressing more closely to them who is leading,<br>
+                    When we are forced to turn from the fray,<br>
+                    Trusting the armies that are strong to defend us,<br>
+                    Happy how happy our praises each day…<br><br>
+    
+                    Marching in the steps of gentle vivian girls,<br>
+                    Footsteps of faithfulness, bravery and love,<br>
+                    Looking to Go for the victory freely<br>
+                    promised<br>
+                    Happy how happy our journey above.<br><br>
+    
+                    Trying to march in the steps of the savior,<br>
+                    Onward still onward we’ll follow our guide,<br><br>
+    
+                    When we shall see him, the King in his Beauty,<br>
+                    Happy how happy our place at this side…<br><br>
+    
+                    Chorus:<br>
+                    How beautiful to march in the steps of the saviour,<br>
+                    Onward in the fight, Onward in the fight,<br>
+                    How beautiful to march in the steps of the saviour,<br>
+                    Led in paths of Light…<br><br>
+                </p>
+                <hr>
+                <h2>4. BRING THEM IN</h2>
+                <p>
+                    Hark tis the cannons roar I hear,<br>
+                    Out in the lands so dark and drear,<br>
+                    Destroying the foe who’ve gone astray,<br>
+                    Far from the main folds away.<br><br>
+    
+                    Who’ll go and Storm their lines behind,<br>
+                    Help us the wandering slaves to<br>
+                    find,<br>
+                    Who’ll bring the lost ones to the fold,<br>
+                    Where they’ll be sheltered from the cold.<br><br>
+    
+                    Out in the plains hear their cry,<br>
+                    Out in the mountains wild and High,<br>
+                    Hark this the battle cry for thee,<br>
+                    Go find the children where ever they be.<br><br>
+    
+                    Chorus:<br>
+                    Bring them in. Bring them in.<br>
+                    Bring them in fron the fields of blood.<br>
+                    Bring them in. Bring them in.<br>
+                    Bring the wandering children to us.<br>
+                </p>
+                <hr>
+                <h2>5. CAN A BOY FORGET HIS MOTHER</h2>
+                <p>
+                    Can a boy forget his mothers pa prayers,<br>
+                    When he has wandered, God knows where,<br>
+                    Its down the path of death and shame.<br>
+                    But Mothers prayers are heard the same.<br><br>
+    
+                    Can a boy forget his mothers face<br>
+                    Whose<br>
+                    heart was kind and filled with grace,<br>
+                    Her Loving voice, it echoes sweet,<br>
+                    She waits, she longs her boy to meet.<br><br>
+    
+                    Can a boy forget his mothers door<br>
+                    From which he wandered years before,<br>
+                    With tears and sighs she said goodbye,<br>
+                    Meet me my boy beyond the sky.<br><br>
+    
+                    Can a boy forget that she is dead<br>
+                    Though many years have passed and fled,<br>
+                    There was that prayer, that sweet goodbye,<br>
+                    She waits to welcome thee on high.<br><br>
+    
+                    Chorus :<br>
+                    Come back my boy come back I say<br>
+                    And walk now in thy mothers way.<br>
+                    Come back my boy, come back I say,<br>
+                    And walk now in thy mothers way….<br>
+                </p>
+                <hr>
+                <h2>6. WE SIGH FOR THE CHILD SLAVES</h2>
+                <p>
+                    We sigh for the child slaves, dread the pains of the new<br>
+                    Their raking sorrows are many, their joys are few<br>
+                    None are singing, none are dancing<br>
+                    Hearts breaking, none entrancing<br>
+                    Welcome the good soldiers and welcome the true<br>
+                    Daylight is unhappiness, their sad evening is near<br>
+                    Their sun of brightness has set, yet no stars shall appear<br>
+                    None are singing, none are dancing<br>
+                    All in sorrow, none entrancing<br>
+                    They wait for the dawn of a glad new year<br>
+                    And the trees of life shall wither, the sparks of life shall fall<br>
+                    Sorrow still should come and death will horribly call<br>
+                    All is alarming, all are in grieving<br>
+                    And the rebel hearts deceiving<br>
+                    And hope comforts all<br>
+                    This tale of war shall be<br>
+                    told and the thunder of cannon sung<br>
+                    The storming of rebel lines broken, their formation unstrung<br>
+                    The battles’ roar alarming, the horrors leave us grieving<br><br>
+                    
+                    Child slaves will feel joy when the rebels shall be flung<br>
+                    With child freedom coming, new tree spring from the old<br>
+                    And peaceful times blossoming leaves unfold<br>
+                    All will be cheering, all childish hearts gladdening<br>
+                    Vivian Wickey shall fall, when the rebellion goes down<br>
+                    The storm of war shall be over and the trees laden with fruits as of old<br>
+                </p>
+                <hr>
+                <h2>7. BLESSED ASSURANCE</h2>
+                <p>
+                    Blessed assurance, Glandelinia is mine,<br>
+                    Of what a foretaste of Glory devine.<br>
+                    Heir of nations purchased from god,<br>
+                    When nations in his spirit, are washed in blood.<br><br>
+    
+                    Perfect submission, perfect delight,<br>
+                    Visions of rapture burst forth on my sight,<br>
+                    Armies advancing, bring yell far above,<br>
+                    Echoes of fury, lack of Love.<br><br>
+    
+                    Perfect submission, all is lost,<br>
+                    To our foes, am happy and blest,<br>
+                    Watching and marching, and listening above,<br>
+                    Yells of their victory, lost in their love.<br><br>
+    
+                    Chorus :<br>
+                    This is my story. This is my song.<br>
+                    Praising the Abbieannians all the day long,<br>
+                    This is my story, this is my song,<br>
+                    Praising the Abbieannians all the day long.<br>
+                </p>
+                <hr>
+                <h2>8. WE’LL NEVER SAY GOODBY.</h2>
+                <p>
+                    Our friends on earth we meet in sorrow<br>
+                    While swift the war storm rage,<br>
+                    Yet ever comes the sadness that we must say goodby.<br><br>
+    
+                    How fearful is the thoughts that linger,<br>
+                    When loved ones cross deaths land,<br>
+                    That when the battles fury here are ended,<br>
+                    With them we’ll be at hand.<br><br>
+    
+                    No parting words had ever been spoken<br>
+                    Amid that blinding storm of carnage,<br>
+                    But yells of fury and derision and rage,<br>
+                    Shall ever more be raged.<br><br>
+    
+                    Chorus :<br>
+                    We’ll never say goodby in battle,<br>
+                    We’ll never say goodby,<br>
+                    For in that land of battle and storm,<br>
+                    We’ll never say goodby.<br>
+                </p>
+                <hr>
+                <h2>9. SCATTERING THE FIERCE FOEMAN.</h2>
+                <p>
+                    Scattering the fierce foeman by the way side,<br>
+                    Scattering human fiends by the hill side,<br>
+                    Scattering the foes of children o’er the fields wide,<br>
+                    Scattering fiends of<br>
+                    hell by the way…<br><br>
+    
+                    Scattering the graycoats for the hoeing,<br>
+                    Scattering foemen with the freely sowing,<br>
+                    Scattering fiends surely knowing,<br>
+                    Surely the Lord will send us the reign…<br><br>
+    
+                    Scattering the enemies fierce, doubting never,<br>
+                    Scattering hellish creatures trusting ever,<br>
+                    Sowing the cannon storm, with shell and endeavor,<br>
+                    Trusting the Lord for victory and for yield.<br><br>
+    
+                    Chorus: <br>
+                    Mowing in the morning<br>
+                    Mowing at the noontime,<br>
+                    Mowing in the evening<br>
+                    Tearing the Glandelinian waves by the way.<br>
+                </p>
+            </div>
+        </div>     
+    </div>
+
+    <!-- pixi -->
+    <div id="pixi-container"></div>
+
+    <!-- frame -->
+    <img src="/museums/frame-top-desktop.png" 
+        srcset="/museums/frame-top-mobile.png 1024w,
+                /museums/frame-top-desktop.png 3840w"
+        alt="frame" id="frame-top" class="frame">
+    <img src="/museums/frame-bottom-desktop.png" 
+        srcset="/museums/frame-bottom-mobile.png 1024w,
+                /museums/frame-bottom-desktop.png 3840w"
+        alt="frame" id="frame-bottom" class="frame">
+
+    
+    <div id="map-container">
+        <img src="/museums/map.jpg" alt="map" id="map">
+
+        <!-- MISC -->
+
+        <div class="poi-container squared" style="top: 30%; left: 25%;">     
+            <a href="http://smarturl.it/outsiderdarger" target="_blank"><img src="/museums/c-album-mobile.png"></a>
+            <div class="poi-title border-top">ALBUM</div>
+        </div>
+        <div class="poi-container squared" style="top: 54%; left: 85%;">     
+            <a href="https://open.spotify.com/playlist/3SYv5doZ0g87t1wOxEtwKR?si=aed90d8a8e184f40" target="_blank"><img src="/museums/darger-playlist.png"></a>
+            <div class="poi-title border-top">DARGER'S PLAYLIST</div>
+        </div>
+        <div class="poi-container squared" style="top: 48%; left: 19%;">     
+            <a href="#" class="modal-opener" id="btn-lyrics"><img src="/museums/lyrics.gif"></a>
+            <div class="poi-title border-top">LYRICS</div>
+        </div>
+        <div class="poi-container squared" style="top: 30%; left: 11%;">     
+            <a href="#" class="modal-opener" id="btn-youtube"><img src="/museums/music-videos.gif"></a>
+            <div class="poi-title border-top">MUSIC VIDEOS</div>
+        </div>
+        <div class="poi-container squared" style="top: 50%; left: 53%;">     
+            <a href="#" class="modal-opener" id="btn-short"><img src="/museums/short.gif"></a>
+            <div class="poi-title border-top">SHORT FILM</div>
+        </div>
+        <div class="poi-container squared" style="top: 20%; left: 46%;">     
+            <a href="#" class="modal-opener" id="btn-podcasts"><img src="/museums/podcasts.gif"></a>
+            <div class="poi-title border-top">PODCASTS</div>
+        </div>
+        <div class="poi-container squared" style="top: 55%; left: 7%;">     
+            <a href="#" class="modal-opener" id="btn-bio"><img src="/museums/bio.gif"></a>
+            <div class="poi-title border-top">BIOS</div>
+        </div>
+        <div class="poi-container squared" style="top: 44%; left: 30%;">     
+            <a href="#" class="modal-opener" id="btn-room"><img src="/museums/room.gif"></a>
+            <!-- <a href="https://www.art.org/henry-darger-room-collection/" target="_blank"><img src="/museums/room.jpg"></a> -->
+            <div class="poi-title border-top">DARGER'S ROOM</div>
+        </div>
+
+        <!-- ANIMS -->
+
+        <div class="poi-container" style="top: 72%; left: 58%;">     
+            <a href="#" id="anim-horse" class="anim-poi"><img src="/museums/horse.gif"></a>
+        </div>
+        <div class="poi-container" style="top: 60%; left: 28%;">     
+            <a href="#" id="anim-girl" class="anim-poi"><img src="/museums/girl.gif"></a>
+        </div>
+        <div class="poi-container" style="top: 45%; left: 68%;">     
+            <a href="#" id="anim-girl2" class="anim-poi"><img src="/museums/girl2.gif"></a>
+        </div>
+        <div class="poi-container" style="top: 15%; left: 38%;">     
+            <a href="#" id="anim-heart" class="anim-poi"><img src="/museums/heart.gif"></a>
+        </div>
+        <div class="poi-container" style="top: 55%; left: 77%;">     
+            <a href="#" id="anim-cloudhorse" class="anim-poi"><img src="/museums/cloudhorse.gif"></a>
+        </div>
+        <div class="poi-container" style="top: 48%; left: 92%;">     
+            <a href="#" id="anim-blengins" class="anim-poi"><img src="/museums/blengins.gif"></a>
+        </div>
+
+        <!-- MUSEUMS -->
+
+        <div class="poi-container" style="top: 48.1%; left: 44.2%;">     
+            <a href="https://www.moma.org/artists/28600#works" target="_blank" class="poi" id="poi0"><img src="/museums/poi.png"></a>
+            <div class="poi-title border-top" style="top: -20px; left: 70px;">MOMA</div>
+            <!-- <div class="popup" id="popup0">
+                <a href="#" class="close"><img src="/museums/close.svg"></a>
+                <div class="title">Museum of Modern Art, New York</div>
+                <a href="https://www.moma.org/artists/28600#works" target="_blank" class="link">View collection</a>
+            </div> -->
+        </div>
+
+        <div class="poi-container" style="top: 46.6%; left: 43.7%;">     
+            <a href="http://collection.folkartmuseum.org/people/492/henry-darger/objects" target="_blank" class="poi" id="poi1"><img src="/museums/poi.png"></a>
+            <div class="poi-title border-bottom" style="top: -60px; left: -15px;">FOLK ART</div>
+            <!-- <div class="popup" id="popup1">
+                <a href="#" class="close"><img src="/museums/close.svg"></a>
+                <div class="title">American Folk Art Museum, New York</div>
+                <a href="http://collection.folkartmuseum.org/people/492/henry-darger/objects" target="_blank" class="link">View collection</a>
+            </div> -->
+        </div>
+
+        <div class="poi-container" style="top: 45.6%; left: 44.2%;">     
+            <a href="https://whitney.org/artists/11701" target="_blank" class="poi" id="poi2"><img src="/museums/poi.png"></a>
+            <div class="poi-title border-bottom" style="top: -50px; left: 90px;">WHITNEY</div>
+            <!-- <div class="popup" id="popup2">
+                <a href="#" class="close"><img src="/museums/close.svg"></a>
+                <div class="title">Whitney Museum of American Art, New York</div>
+                <a href="https://whitney.org/artists/11701" target="_blank" class="link">View collection</a>
+            </div> -->
+        </div>
+
+        <div class="poi-container" style="top: 51%; left: 43.5%;">     
+            <a href="https://americanart.si.edu/artist/henry-darger-1122" target="_blank" class="poi" id="poi3"><img src="/museums/poi.png"></a>
+            <div class="poi-title border-top" style="top: -15px; left: 133px;">SMITHSONIAN</div>
+            <!-- <div class="popup" id="popup3">
+                <a href="#" class="close"><img src="/museums/close.svg"></a>
+                <div class="title">Smithsonian American Art Museum, Washington, D.C.</div>
+                <a href="https://americanart.si.edu/artist/henry-darger-1122" target="_blank" class="link">View collection</a>
+            </div> -->
+        </div>
+
+        <div class="poi-container" style="top: 36.5%; left: 34%;">     
+            <a href="https://www.artic.edu/artists/5947/henry-darger" target="_blank" class="poi" id="poi4"><img src="/museums/poi.png"></a>
+            <div class="poi-title border-bottom" style="top: -68px; left: 104px;">ART INSTITUTE</div>
+            <!-- <div class="popup" id="popup4">
+                <a href="#" class="close"><img src="/museums/close.svg"></a>
+                <div class="title">Art Institute Of Chicago, Chicago, Illinois</div>
+                <a href="https://www.artic.edu/artists/5947/henry-darger" target="_blank" class="link">View collection</a>
+            </div> -->
+        </div>
+
+        <div class="poi-container" style="top: 37%; left: 33.5%;">     
+            <a href="https://mcachicago.org/Collection/Items/Unknown/Henry-Darger-Untitled-Blengin-
+            Creature-Despite-Being-Defended-Date-Unknown" target="_blank" class="poi" id="poi5"><img src="/museums/poi.png"></a>
+            <div class="poi-title border-bottom" style="top: -50px; left: -15px;">MCA</div>
+            <!-- <div class="popup" id="popup5">
+                <a href="#" class="close"><img src="/museums/close.svg"></a>
+                <div class="title">Museum of Contemporary Art, Chicago, Illinois</div>
+                <a href="https://mcachicago.org/Collection/Items/Unknown/Henry-Darger-Untitled-Blengin-
+                Creature-Despite-Being-Defended-Date-Unknown" target="_blank" class="link">View collection</a>
+            </div> -->
+        </div>
+
+        <div class="poi-container" style="top: 39%; left: 33.6%;">     
+            <a href="https://www.art.org/henry-darger-room-collection/" target="_blank" class="poi" id="poi6"><img src="/museums/poi.png"></a>
+            <div class="poi-title border-top" style="top: -18px; left: -15px;">INTUIT</div>
+            <!-- <div class="popup" id="popup6">
+                <a href="#" class="close"><img src="/museums/close.svg"></a>
+                <div class="title">The Center for Intuitive and Outsider Art, Chicago, Illinois</div>
+                <a href="https://www.art.org/henry-darger-room-collection/" target="_blank" class="link">View collection</a>
+            </div> -->
+        </div>
+
+        <div class="poi-container" style="top: 38.8%; left: 34.1%;">     
+            <a href="https://smartcollection.uchicago.edu/people/348/henry-darger/objects" target="_blank" class="poi" id="poi7"><img src="/museums/poi.png"></a>
+            <div class="poi-title border-top" style="top: -18px; left: 75px;">SMART</div>
+            <!-- <div class="popup" id="popup7">
+                <a href="#" class="close"><img src="/museums/close.svg"></a>
+                <div class="title">Smart Museum of Art, Chicago, Illinois</div>
+                <a href="https://smartcollection.uchicago.edu/people/348/henry-darger/objects" target="_blank" class="link">View collection</a>
+            </div> -->
+        </div>
+
+        <div class="poi-container" style="top: 30%; left: 34.8%;">     
+            <a href="http://collection.mam.org/search.php?search=Darger%2C%20Henry" target="_blank" class="poi" id="poi8"><img src="/museums/poi.png"></a>
+            <div class="poi-title border-bottom" style="top: -50px; left: 60px;">MAM</div>
+            <!-- <div class="popup" id="popup8">
+                <a href="#" class="close"><img src="/museums/close.svg"></a>
+                <div class="title">Milwaukee Art Museum, Milwaukee, Wisconsin</div>
+                <a href="http://collection.mam.org/search.php?search=Darger%2C%20Henry" target="_blank" class="link">View collection</a>
+            </div> -->
+        </div>
+
+        <div class="poi-container" style="top: 24.6%; left: 31.2%;">     
+            <a href="https://walkerart.org/collections/artists/henry-darger" target="_blank" class="poi" id="poi9"><img src="/museums/poi.png"></a>
+            <div class="poi-title border-top" style="top: -17px; left: 48px;">WAC</div>
+            <!-- <div class="popup" id="popup9">
+                <a href="#" class="close"><img src="/museums/close.svg"></a>
+                <div class="title">Walker Art Center, Minneapolis, Minnesota</div>
+                <a href="https://walkerart.org/collections/artists/henry-darger" target="_blank" class="link">View collection</a>
+            </div> -->
+        </div>
+
+        <div class="poi-container" style="top: 60.6%; left: 40.2%;">     
+            <a href="https://high.org/collections/40-at-jenny-richee-facing-attack-by-blengiglomeneans-whomistake-
+            them-for-little-glandelinians-because-they-wore-gray-unforms-the-only-way-tosave-
+            save-themselves-is-to-undress-hide-the-glandelinia/" target="_blank" class="poi" id="poi10"><img src="/museums/poi.png"></a>
+            <div class="poi-title border-top" style="top: -18px; left: 97px;">HIGH MUSEUM OF ART</div>
+            <!-- <div class="popup" id="popup10">
+                <a href="#" class="close"><img src="/museums/close.svg"></a>
+                <div class="title">High Museum of Art, Atlanta, Georgia</div>
+                <a href="https://high.org/collections/40-at-jenny-richee-facing-attack-by-blengiglomeneans-whomistake-
+                them-for-little-glandelinians-because-they-wore-gray-unforms-the-only-way-tosave-
+                save-themselves-is-to-undress-hide-the-glandelinia/" target="_blank" class="link">View collection</a>
+            </div> -->
+        </div>
+
+        <div class="poi-container" style="top: 42.3%; left: 57.5%;">     
+            <a href="https://www.mam.paris.fr/fr/oeuvre/henry-darger" target="_blank" class="poi" id="poi11"><img src="/museums/poi.png"></a>
+            <div class="poi-title border-bottom" style="top: -50px; left: 60px;">MAM</div>
+            <!-- <div class="popup" id="popup11">
+                <a href="#" class="close"><img src="/museums/close.svg"></a>
+                <div class="title">Musée d'Art moderne de la Ville de Paris, Paris, France</div>
+                <a href="https://www.mam.paris.fr/fr/oeuvre/henry-darger" target="_blank" class="link">View collection</a>
+            </div> -->
+        </div>
+
+        <div class="poi-container" style="top: 35.6%; left: 57.5%;">     
+            <a href="https://www.musee-lam.fr/fr/rechercher?query=Darger" target="_blank" class="poi" id="poi12"><img src="/museums/poi.png"></a>
+            <div class="poi-title border-bottom" style="top: -45px; left: 50px;">LAM</div>
+            <!-- <div class="popup" id="popup12">
+                <a href="#" class="close"><img src="/museums/close.svg"></a>
+                <div class="title">Lille métropole musée d'art moderne d'art contemporain et d'art brut, Villeneuve-d’Ascq</div>
+                <a href="https://www.musee-lam.fr/fr/rechercher?query=Darger" target="_blank" class="link">View collection</a>
+            </div> -->
+        </div>
+
+        <div class="poi-container" style="top: 45.1%; left: 60%;">     
+            <a href="https://www.artbrut.ch/fr_CH/auteurs/la-collection-de-l-art-brut/darger-henry" target="_blank" class="poi" id="poi13"><img src="/museums/poi.png"></a>
+            <div class="poi-title border-top" style="top: -18px; left: 120px;">COLLECTION DE L'ART BRUT</div>
+            <!-- <div class="popup" id="popup13">
+                <a href="#" class="close"><img src="/museums/close.svg"></a>
+                <div class="title">Collection de l'Art Brut, Lausanne, Switzerland</div>
+                <a href="https://www.artbrut.ch/fr_CH/auteurs/la-collection-de-l-art-brut/darger-henry" target="_blank" class="link">View collection</a>
+            </div> -->
+        </div>
+
+        <div class="poi-container" style="top: 30.1%; left: 55.9%;">     
+            <a href="http://www.musevery.com/artists/henrydarger/" target="_blank" class="poi" id="poi14"><img src="/museums/poi.png"></a>
+            <div class="poi-title border-bottom" style="top: -85px; left: 128px;">THE MUSEUM OF EVERYTHING</div>
+            <!-- <div class="popup" id="popup14">
+                <a href="#" class="close"><img src="/museums/close.svg"></a>
+                <div class="title">The Museum of Everything, London, England</div>
+                <a href="https://www.gallevery.com/artists/henry-darger" target="_blank" class="link">View collection</a>
+            </div> -->
+        </div>
+
+        <div class="poi-container" style="top: 22.6%; left: 53.9%;">     
+            <a href="http://gallerysearch.ds.man.ac.uk/Detail/56046" target="_blank" class="poi" id="poi15"><img src="/museums/poi.png"></a>
+            <div class="poi-title border-bottom" style="top: -50px; left: 120px;">WHITWORTH</div>
+            <!-- <div class="popup" id="popup15">
+                <a href="#" class="close"><img src="/museums/close.svg"></a>
+                <div class="title">Whitworth Art Gallery, Manchester, UK</div>
+                <a href="http://gallerysearch.ds.man.ac.uk/Detail/56046" target="_blank" class="link">View collection</a>
+            </div> -->
+        </div>
+
+    </div>
+    
+    
+    <script
+        src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+        crossorigin="anonymous">
+    </script>
+    <script src="/museums/dragscroll.js"></script>
+    <script>
+        $(document).ready(function(){
+
+            window.scrollTo(1500, 130);
+            
+            $('.poi').mouseover(function(){
+                $(this).children('img').attr('src', '/museums/poi-hover.png');
+            });
+            $('.poi').mouseout(function(){
+                $(this).children('img').attr('src', '/museums/poi.png');
+            });
+
+            $('body').mousedown(function(){
+                $(this).css('cursor', 'grabbing');
+            });
+            $('body').mouseup(function(){
+                $(this).css('cursor', 'grab');
+            });
+
+            $('.btn-close').click(function(e){
+                e.preventDefault();
+                $('.modal').hide();
+            });
+
+            $('.modal-opener').click(function(e){
+                e.preventDefault();
+
+                switch (this.id) {
+                    case 'btn-lyrics':
+                    $('#lyrics').show();
+                        break;
+
+                    case 'btn-youtube':
+                    $('#youtube').show();
+                        break;
+
+                    case 'btn-short':
+                    $('#short').show();
+                        break;
+
+                    case 'btn-podcasts':
+                     $('#podcasts').show();
+                        break;
+
+                    case 'btn-bio':
+                    $('#bio').show();
+                        break;
+
+                    case 'btn-room':
+                    $('#room').show(); 
+                        break;
+                
+                    default:
+                        break;
+                }
+            });
+        });
+    </script>
+
+    <script src="/museums/pixi.min.js"></script>
+    <script src="/museums/anime.min.js"></script>
+    <script src="/museums/sound.js"></script>
+    <script src="/museums/sound-loader.js"></script>
+    <script>
+
+        // todo: obj plutôt que array
+        var animations = [
+            {
+                name: 'horse',
+                pixiObject: null
+            },
+            {
+                name: 'girl',
+                pixiObject: null
+            },
+            {
+                name: 'heart',
+                pixiObject: null
+            },
+            {
+                name: 'blengins',
+                pixiObject: null
+            },
+            {
+                name: 'cloudhorse',
+                pixiObject: null
+            },
+            {
+                name: 'girl2',
+                pixiObject: null
+            }
+        ];
+
+        // app
+        // -------------
+        const app = new PIXI.Application({
+            autoResize: true,
+            resolution: devicePixelRatio,
+            transparent: true
+        });
+        document.getElementById('pixi-container').appendChild(app.view);
+
+        // resize
+        // -------------
+        //todo: remplacer tous les windows.innerwidth/height par des globales updatées ici
+        window.addEventListener('resize', resize);
+        function resize() {
+            app.renderer.resize(window.innerWidth, window.innerHeight);
+        }
+        resize();
+
+        // load
+        // -------------
+        animations.forEach(animation => {
+            PIXI.Loader.shared.add('/museums/'+animation.name+'.json')
+        });
+        PIXI.Loader.shared.load(start);
+
+        // start
+        // -------------
+        function start() {
+
+            // create pixi animations
+            // -------------
+            animations.forEach(animation => {
+                let sheet = PIXI.Loader.shared.resources['/museums/'+animation.name+'.json'].spritesheet;
+                animation.pixiObject = new PIXI.AnimatedSprite(sheet.animations[animation.name]);
+                animation.pixiObject.animationSpeed = 0.5;
+                app.stage.addChild(animation.pixiObject);
+            });
+
+
+            // INITS
+            //
+            animations[0].pixiObject.x = window.innerWidth - 200;
+            animations[0].pixiObject.y = window.innerHeight * .3;
+            animations[0].pixiObject.visible = false;
+            //
+            animations[1].pixiObject.y = 100;
+            animations[1].pixiObject.visible = false;
+            animations[1].pixiObject.animationSpeed = .1;
+            animations[1].pixiObject.loop = false;
+            //
+            animations[2].pixiObject.x = window.innerWidth * .3;
+            animations[2].pixiObject.y = 100;
+            animations[2].pixiObject.visible = false;
+            animations[2].pixiObject.animationSpeed = .3;
+            //
+            animations[3].pixiObject.x = -800;
+            animations[3].pixiObject.visible = false;
+            //
+            animations[4].pixiObject.x = window.innerWidth * .3;
+            animations[4].pixiObject.y = 0;
+            animations[4].pixiObject.visible = false;
+            animations[4].pixiObject.loop = false;
+            animations[4].pixiObject.animationSpeed = .2;
+            //
+            //
+            animations[5].pixiObject.x = -200;
+            animations[5].pixiObject.y = 500;
+            animations[5].pixiObject.visible = false;
+        }
+
+        var locked0 = false;
+        var locked1 = false;
+        var locked2 = false;
+        var locked3 = false;
+        var locked4 = false;
+        var locked5 = false;
+
+        var sounds = [];
+        SoundLoader.init([
+            "/museums/snd/9.wav", // horse
+            "/museums/snd/2-1.wav", // girl
+            "/museums/snd/2-0.wav", // heart
+            "/museums/snd/2-9.wav", // blengins
+            "/museums/snd/2-7.wav", // cloudhorse
+            "/museums/snd/30.wav", // girl2
+            "/museums/snd/21.wav", // backing
+        ], function(snds, context){
+            sounds = snds;
+        });
+
+        // document.body.addEventListener('click', function(e){
+        //     e.preventDefault();
+        //     // backing
+        //     sounds[6].play(1, 0, true);
+        // });
+
+        // anim poi click
+        // -------------
+        $('.anim-poi').click(clickAnim);
+        function clickAnim(e) {
+            e.preventDefault();
+
+            switch (this.id) {
+
+                //horse
+                case 'anim-horse':
+                    if(!locked0){                       
+                        animations[0].pixiObject.x = window.innerWidth - 500;
+                        sounds[0].play();
+
+                        anime({
+                            targets: animations[0].pixiObject,
+                            x: -800,
+                            y: window.innerHeight * .3,
+                            easing: 'linear',
+                            duration: 6000,
+                            begin: function(){
+                                animations[0].pixiObject.play();
+                                animations[0].pixiObject.visible = true;
+                            },
+                            complete: function(){
+                                animations[0].pixiObject.stop();
+                                animations[0].pixiObject.visible = false;
+                                locked0 = false;
+                            }
+                        });
+
+                        // anime({
+                        //     targets: '.background',
+                        //     backgroundColor: 'rgb('+Math.random()*255+', '+Math.random()*255+', '+Math.random()*255+')',
+                        //     duration: 2000,
+                        //     easing: 'easeInOutQuad'
+                        // });
+                    }
+                    locked0 = true;
+
+                    break;
+
+                //girl
+                case 'anim-girl':
+                    if(!locked1){
+                        sounds[1].play();
+                        animations[1].pixiObject.x = 200;
+                        animations[1].pixiObject.y = 200;
+
+                        anime({
+                            targets: animations[1].pixiObject,
+                            x: 300,
+                            y: 0,
+                            easing: 'easeOutSine',
+                            duration: 5000,
+                            begin: function(){
+                                animations[1].pixiObject.gotoAndPlay(0);
+                                animations[1].pixiObject.visible = true;
+                            },
+                            complete: function(){
+                                animations[1].pixiObject.stop();
+                                animations[1].pixiObject.visible = false;
+                                locked1 = false;
+                            }
+                        });
+                    }
+                    locked1 = true;                
+                    break;
+
+                //heart
+                case 'anim-heart':
+                    if(!locked2){            
+                        animations[2].pixiObject.y = 400;
+                        sounds[2].play();
+
+                        anime({
+                            targets: animations[2].pixiObject,
+                            //x: Math.random() * 200,
+                            y: 100,
+                            //tint: 0x07ff41,
+                            easing: 'easeOutSine',
+                            duration: 5000,
+                            begin: function(){
+                                animations[2].pixiObject.play();
+                                animations[2].pixiObject.visible = true;
+                            },
+                            complete: function(){
+                                animations[2].pixiObject.stop();
+                                animations[2].pixiObject.visible = false;
+                                locked2 = false;
+                            }
+                        });
+                    }
+                    locked2 = true;
+                    break;
+
+                //blengins
+                case 'anim-blengins':
+                    if(!locked3){             
+                        animations[3].pixiObject.x = -200;
+                        animations[3].pixiObject.y = 350;
+                        sounds[3].play();
+
+                        anime({
+                            targets: animations[3].pixiObject,
+                            x: window.innerWidth,
+                            y: Math.random() * 200,
+                            easing: 'easeOutSine',
+                            duration: 6500,
+                            begin: function(){
+                                animations[3].pixiObject.play();
+                                animations[3].pixiObject.visible = true;
+                            },
+                            complete: function(){
+                                animations[3].pixiObject.stop();
+                                animations[3].pixiObject.visible = false;
+                                locked3 = false;
+                            }
+                        });
+                    }
+                    locked3 = true;                
+                    break;
+
+                //cloud
+                case 'anim-cloudhorse':
+                    if(!locked4){
+                        sounds[4].play();
+                        animations[4].pixiObject.x = 500;
+                        animations[4].pixiObject.y = 300;
+
+                        anime({
+                            targets: animations[4].pixiObject,
+                            x: 600,
+                            y: 100,
+                            easing: 'easeInOutQuad',
+                            duration: 6000,
+                            begin: function(){
+                                animations[4].pixiObject.gotoAndPlay(0);
+                                animations[4].pixiObject.visible = true;
+                            },
+                            complete: function(){
+                                animations[4].pixiObject.stop();
+                                animations[4].pixiObject.visible = false;
+                                locked4 = false;
+                            }
+                        });
+                    }
+                    locked4 = true;                  
+                    break;
+
+                // girl 2
+                case 'anim-girl2':
+                    if(!locked5){                    
+                        animations[5].pixiObject.x = -200;
+                        animations[5].pixiObject.y = 500;
+                        sounds[5].play();
+
+                        anime({
+                            targets: animations[5].pixiObject,
+                            x: window.innerWidth / 2,
+                            y: Math.random() * 200,
+                            easing: 'easeInOutQuad',
+                            duration: 2000,
+                            begin: function(){
+                                animations[5].pixiObject.gotoAndPlay(0);
+                                animations[5].pixiObject.visible = true;
+                            },
+                            complete: function(){
+                                animations[5].pixiObject.stop();
+                                animations[5].pixiObject.visible = false;
+                                locked5 = false;
+                            }
+                        });
+                    }
+                    locked5 = true;  
+                    break;
+            
+                default:
+                    break;
+            }
+        }
+        
+    </script>
+</body>
+</html>
